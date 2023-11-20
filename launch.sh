@@ -1,32 +1,30 @@
-### I'm currently using the launch-polybar.sh instead of this file
+#!/bin/bash
 
-
-#!/usr/bin/env sh
-
-# More info : https://github.com/jaagr/polybar/wiki
-
-# Install the following applications for polybar and icons in polybar if you are on ArcoLinuxD
-# awesome-terminal-fonts
-# Tip : There are other interesting fonts that provide icons like nerd-fonts-complete
-# --log=error
-# Terminate already running bar instances
+# Terminate already running bar instances 
 killall -q polybar
 
 # Wait until the processes have been shut down
 while pgrep -u $UID -x polybar > /dev/null; do sleep 1; done
 
-desktop=$(echo $DESKTOP_SESSION)
-count=$(xrandr --query | grep " connected" | cut -d" " -f1 | wc -l)
+# Get the static hostname
+HOSTNAME=$(hostnamectl --static)
 
-case $desktop in
+# Loop through monitors
+for m in $(xrandr --query | grep "connected" | cut -d" " -f1); do
 
-    i3|/usr/share/xsessions/i3)
-    if type "xrandr" > /dev/null; then
-      for m in $(xrandr --query | grep " connected" | cut -d" " -f1); do
-        MONITOR=$m polybar --reload mainbar-i3 -c ~/.config/polybar/config.ini &
-      done
-    else
-    polybar --reload mainbar-i3 -c ~/.config/polybar/config.ini &
-    fi
-    
-  esac
+  # Check hostname and launch appropriate bar 
+  if [ "$HOSTNAME" == "brett-ms7d82" ]; then
+
+    # Launch desktop bar with config file and --reload
+    MONITOR=$m polybar --reload mainbar-i3-desktop -c ~/.config/polybar/config.ini
+
+  elif [ "$HOSTNAME" == "brett-k501ux" ]; then
+
+    # Launch laptop bar with config file and --reload 
+    MONITOR=$m polybar --reload mainbar-i3-laptop -c ~/.config/polybar/config.ini
+
+  else
+    echo "Unknown hostname: $HOSTNAME"
+  fi
+
+done
