@@ -1,3 +1,6 @@
+### I'm currently using the launch-polybar.sh instead of this file
+
+
 #!/usr/bin/env sh
 
 # More info : https://github.com/jaagr/polybar/wiki
